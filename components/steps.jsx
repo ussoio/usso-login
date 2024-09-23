@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { TextField, Typography, Link } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
+import axios from "axios";
 
 export default function DynamicLogin({ data }) {
     const [step, setStep] = useState(1);
@@ -22,24 +23,54 @@ export default function DynamicLogin({ data }) {
             identifier: "",
         },
         validationSchema: validationSchema,
-        onSubmit: (values, { setSubmitting }) => {
-            if (step === 1) {
-                const matchedOption = data.options.find((option) => new RegExp(option.regex).test(values.identifier));
-                if (matchedOption) {
-                    setSelectedOption(matchedOption);
-                    setCurrentSecretType(matchedOption.secrets[0].type);
-                    setStep(2);
-                    // Initialize secret fields
-                    matchedOption.secrets.forEach((secret) => {
-                        formik.setFieldValue(secret.type, "");
+        onSubmit: async (values, { setSubmitting }) => {
+            try {
+                if (step === 1) {
+                    // Step 1: Find the matched option
+                    const matchedOption = data.options.find((option) =>
+                        new RegExp(option.regex).test(values.identifier)
+                    );
+                    if (matchedOption) {
+                        setSelectedOption(matchedOption);
+                        setCurrentSecretType(matchedOption.secrets[0].type);
+                        setStep(2);
+
+                        // Prepare the payload for the first API call
+                        const payload = {
+                            method: matchedOption.secrets[0].method, // Use the method from the first secret of the matched option
+                            [matchedOption.identifier]: values.identifier, // e.g., "username": "USERNAME"
+                        };
+
+                        // Call the first step API using the matched option's API
+                        await axios.post(matchedOption.api, payload, {
+                            headers: { "Content-Type": "application/json" },
+                        });
+
+                        // Initialize secret fields
+                        matchedOption.secrets.forEach((secret) => {
+                            formik.setFieldValue(secret.type, "");
+                        });
+                    }
+                } else {
+                    // Step 2: Handle secret submission
+                    const secret = selectedOption.secrets.find((s) => s.type === currentSecretType);
+                    const payload = {
+                        [selectedOption.identifier]: formik.values.identifier, // e.g., "username": "USERNAME"
+                        [secret.name]: formik.values[secret.type], // e.g., "password": "PASSWORD"
+                    };
+
+                    // Call the second step API using the secret's API
+                    const response = await axios.post(secret.api, payload, {
+                        headers: { "Content-Type": "application/json" },
                     });
+
+                    console.log("Login successful:", response.data);
                 }
-            } else {
-                // Handle final form submission here
-                console.log("Form submitted:", values);
-                // You can send the data to your API here
+            } catch (error) {
+                console.error("API call failed:", error);
+            } finally {
+                setSubmitting(false);
             }
-            setSubmitting(false);
         },
     });
 
@@ -49,8 +80,32 @@ export default function DynamicLogin({ data }) {
         }
     }, [selectedOption]);
 
-    const handleSecretTypeChange = (secretType) => {
+    const handleSecretTypeChange = async (secretType) => {
         setCurrentSecretType(secretType);
+
+        // When secret type is changed, make another call to the first step API with the new method
+        if (selectedOption) {
+            const secret = selectedOption.secrets.find((s) => s.type === secretType);
+
+            if (secret) {
+                const payload = {
+                    method: secret.method, // Use the new method corresponding to the new secret type
+                    [selectedOption.identifier]: formik.values.identifier, // e.g., "username": "USERNAME"
+                };
+
+                try {
+                    // Call the first step API again with the new method
+                    await axios.post(selectedOption.api, payload, {
+                        headers: { "Content-Type": "application/json" },
+                    });
+
+                    // Reset the value for the new secret type field
+                    formik.setFieldValue(secret.type, "");
+                } catch (error) {
+                    console.error("API call failed while switching secret type:", error);
+                }
+            }
+        }
     };
 
     const renderSecretField = () => {
