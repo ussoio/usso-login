@@ -2,13 +2,6 @@
 
 import { createTheme } from "@mui/material";
 
-const theme = createTheme({
-    cssVariables: true,
-    direction: "rtl",
-    typography: {
-        fontFamily: "Vazir, Arial, sans-serif",
-    },
-    // Customize your theme here
-});
+const theme = (theme) => createTheme(theme);
 
 export default theme;
