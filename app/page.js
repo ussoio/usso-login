@@ -5,6 +5,7 @@ import { createTheme } from "@mui/material/styles";
 
 import { useQuery } from "@tanstack/react-query";
 import { getConfig } from "@/api/sso.api";
+import Loading from "./loading";
 
 import Steps from "@/components/steps";
 import Branding from "@/components/branding";
@@ -17,17 +18,20 @@ export default function Page() {
     });
 
     if (configs.isLoading) {
-        return <span>Loading</span>;
+        return <Loading></Loading>;
     }
 
     const themeConfig = createTheme({
         cssVariables: true,
         direction: "rtl",
         typography: {
-            fontFamily: "Vazir, Arial, sans-serif",
+            ...configs.data.branding.typography,
+        },
+        shape: {
+            ...configs.data.branding.shape,
         },
         palette: {
-            ...configs.data.branding.colors,
+            ...configs.data.branding.palette,
         },
     });
 

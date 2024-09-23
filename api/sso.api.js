@@ -6,7 +6,10 @@ const data = {
         favicon: "https://cdn.jsdelivr.net/gh/0x1un/CDN/img/favicon.ico",
         title: "پیکسی",
         description: "به پیکسی خوش آمدید.",
-        colors: {
+        shape: {
+            borderRadius: 12,
+        },
+        palette: {
             primary: {
                 main: "#f44336",
             },
