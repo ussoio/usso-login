@@ -7,15 +7,13 @@ import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
 
 export default function DynamicLogin({ data }) {
-    const loginConfig = data.find((method) => method.type == "credential");
-
     const [step, setStep] = useState(1);
     const [selectedOption, setSelectedOption] = useState(null);
     const [currentSecretType, setCurrentSecretType] = useState(null);
 
     const validationSchema = Yup.object().shape({
         identifier: Yup.string().test("match-any", "Invalid input", function (value) {
-            return loginConfig.options.some((option) => new RegExp(option.regex).test(value));
+            return data.options.some((option) => new RegExp(option.regex).test(value));
         }),
     });
 
@@ -26,9 +24,7 @@ export default function DynamicLogin({ data }) {
         validationSchema: validationSchema,
         onSubmit: (values, { setSubmitting }) => {
             if (step === 1) {
-                const matchedOption = loginConfig.options.find((option) =>
-                    new RegExp(option.regex).test(values.identifier)
-                );
+                const matchedOption = data.options.find((option) => new RegExp(option.regex).test(values.identifier));
                 if (matchedOption) {
                     setSelectedOption(matchedOption);
                     setCurrentSecretType(matchedOption.secrets[0].type);

@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Divider, Typography, ThemeProvider } from "@mui/material";
+import { Box, Divider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
 import { useQuery } from "@tanstack/react-query";
@@ -41,7 +41,7 @@ export default function Page() {
                 <Box className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
                     <Branding data={configs.data.branding} />
 
-                    <Steps data={configs.data.methods.filter((method) => method.type == "credential")}></Steps>
+                    <Steps data={configs.data.methods.filter((method) => method.type == "credential")[0]}></Steps>
 
                     <Divider className="my-6">یا</Divider>
 
