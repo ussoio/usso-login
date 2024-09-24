@@ -64,7 +64,7 @@ export default function DynamicLogin({ data }) {
                     };
 
                     // Call the second step API using the secret's API
-                    const response = await axios.post(secret.api, payload, {
+                    const response = await axios.post(`${secret.api}?callback=${callback}`, payload, {
                         headers: { "Content-Type": "application/json" },
                     });
 
@@ -158,8 +158,9 @@ export default function DynamicLogin({ data }) {
         <form onSubmit={formik.handleSubmit}>
             {step === 1 && (
                 <TextField
+                    dir="ltr"
                     name="identifier"
-                    label={data.options.map((item) => item.identifier).join(" یا ")}
+                    label={data.options.map((item) => item.identifier).join(", ")}
                     fullWidth
                     margin="normal"
                     value={formik.values.identifier}

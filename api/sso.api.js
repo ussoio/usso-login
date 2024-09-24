@@ -110,10 +110,10 @@ const data = {
 
 export async function getConfig() {
     try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        // const res = await api.get("/website/config");
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
+        const res = await api.get("/website/config");
         console.log(data);
-        return data;
+        return res.data;
     } catch (error) {
         throw error;
     }
