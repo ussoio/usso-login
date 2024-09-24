@@ -5,8 +5,9 @@ import * as Yup from "yup";
 import { TextField, Typography, Link } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
-import axios from "axios";
+import axios from "@/utils/axios";
 import { useSearchParams } from "next/navigation";
+import { isEmpty } from "lodash";
 
 export default function DynamicLogin({ data }) {
     const [step, setStep] = useState(1);
@@ -46,9 +47,7 @@ export default function DynamicLogin({ data }) {
                         };
 
                         // Call the first step API using the matched option's API
-                        await axios.post(matchedOption.api, payload, {
-                            headers: { "Content-Type": "application/json" },
-                        });
+                        await axios.post(matchedOption.api, payload);
 
                         // Initialize secret fields
                         matchedOption.secrets.forEach((secret) => {
@@ -64,11 +63,10 @@ export default function DynamicLogin({ data }) {
                     };
 
                     // Call the second step API using the secret's API
-                    const response = await axios.post(`${secret.api}?callback=${callback}`, payload, {
-                        headers: { "Content-Type": "application/json" },
-                    });
+                    const response = await axios.post(`${secret.api}?callback=${callback}`, payload);
 
                     console.log("Login successful:", response.data);
+                    window.location.replace(callback);
                 }
             } catch (error) {
                 console.error("API call failed:", error);
@@ -120,9 +118,10 @@ export default function DynamicLogin({ data }) {
 
         return (
             <TextField
+                dir="ltr"
                 name={secret.type}
-                label={secret.description}
-                placeholder={secret.placeholder}
+                label={secret.placeholder}
+                placeholder={secret.description}
                 type={secret.type === "password" ? "password" : "text"}
                 fullWidth
                 margin="normal"
@@ -160,7 +159,8 @@ export default function DynamicLogin({ data }) {
                 <TextField
                     dir="ltr"
                     name="identifier"
-                    label={data.options.map((item) => item.identifier).join(", ")}
+                    label={data.options.map((item) => item.placeholder).join(", ")}
+                    placeholder={data.options.map((item) => item.description).join(", ")}
                     fullWidth
                     margin="normal"
                     value={formik.values.identifier}
@@ -173,9 +173,13 @@ export default function DynamicLogin({ data }) {
             {step === 2 && (
                 <>
                     {renderSecretField()}
-                    <Typography variant="body2" className="mt-2 mb-4">
-                        یا راه های زیر را امتحان کنید:
-                    </Typography>
+
+                    {!isEmpty(renderSecretOptions()[0]) && (
+                        <Typography variant="body2" className="mt-2 mb-4">
+                            یا راه های زیر را امتحان کنید:
+                        </Typography>
+                    )}
+
                     <div className="flex flex-col mb-4">{renderSecretOptions()}</div>
                 </>
             )}

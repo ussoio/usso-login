@@ -11,6 +11,7 @@ import Steps from "@/components/steps";
 import Branding from "@/components/branding";
 import Providers from "@/components/providers";
 import Legals from "@/components/legals";
+import { isEmpty } from "lodash";
 
 export default function Page() {
     const configs = useQuery({
@@ -35,17 +36,20 @@ export default function Page() {
         },
     });
 
+    const credential = configs.data.methods.filter((method) => method.type == "credential")[0];
+    const providers = configs.data.methods.filter((method) => method.type == "provider");
+
     return (
         <ThemeProvider theme={themeConfig}>
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-                <Box className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+            <div className="flex flex-col items-center justify-center h-screen w-full bg-gray-50">
+                <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md">
                     <Branding data={configs.data.branding} />
 
-                    <Steps data={configs.data.methods.filter((method) => method.type == "credential")[0]}></Steps>
+                    <Steps data={credential}></Steps>
 
-                    <Divider className="my-6">یا</Divider>
+                    {!isEmpty(providers) && <Divider className="my-6">یا</Divider>}
 
-                    <Providers providers={configs.data.methods.filter((method) => method.type == "provider")} />
+                    <Providers providers={providers} />
                 </Box>
 
                 <Legals data={configs.data.legal}></Legals>

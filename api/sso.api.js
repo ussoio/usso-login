@@ -7,10 +7,5 @@ export async function getConfig() {
         return res.data;
     } catch (error) {
         throw error;
-    } finally {
-        if (process.env.NODE_ENV === "development") {
-            console.log("Running in development mode");
-            return data;
-        }
     }
 }
