@@ -110,9 +110,10 @@ const data = {
 
 export async function getConfig() {
     try {
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-        const res = await api.get("https://sso.pixiee.io/website/config");
-        return res.data;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // const res = await api.get("/website/config");
+        console.log(data);
+        return data;
     } catch (error) {
         throw error;
     }

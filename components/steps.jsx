@@ -6,11 +6,15 @@ import { TextField, Typography, Link } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 export default function DynamicLogin({ data }) {
     const [step, setStep] = useState(1);
     const [selectedOption, setSelectedOption] = useState(null);
     const [currentSecretType, setCurrentSecretType] = useState(null);
+
+    const searchParams = useSearchParams();
+    const callback = searchParams.get("callback");
 
     const validationSchema = Yup.object().shape({
         identifier: Yup.string().test("match-any", "Invalid input", function (value) {
@@ -155,7 +159,7 @@ export default function DynamicLogin({ data }) {
             {step === 1 && (
                 <TextField
                     name="identifier"
-                    label="Username, Email, or Phone"
+                    label={data.options.map((item) => item.identifier).join(" یا ")}
                     fullWidth
                     margin="normal"
                     value={formik.values.identifier}
@@ -169,7 +173,7 @@ export default function DynamicLogin({ data }) {
                 <>
                     {renderSecretField()}
                     <Typography variant="body2" className="mt-2 mb-4">
-                        Or try another way:
+                        یا راه های زیر را امتحان کنید:
                     </Typography>
                     <div className="flex flex-col mb-4">{renderSecretOptions()}</div>
                 </>
@@ -183,7 +187,7 @@ export default function DynamicLogin({ data }) {
                 fullWidth
                 className="mt-4"
             >
-                {step === 1 ? "Next" : "Login"}
+                {step === 1 ? "ارسال" : "ورود"}
             </LoadingButton>
         </form>
     );
