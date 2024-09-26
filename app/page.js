@@ -1,5 +1,8 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
 import { Box, Divider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
@@ -11,9 +14,19 @@ import Steps from "@/components/steps";
 import Branding from "@/components/branding";
 import Providers from "@/components/providers";
 import Legals from "@/components/legals";
-import { isEmpty } from "lodash";
+import { isEmpty, isNull } from "lodash";
 
 export default function Page() {
+    const searchParams = useSearchParams();
+    const [callback, setCallback] = useState(searchParams.get("callback"));
+
+    useEffect(() => {
+        if (isNull(callback)) {
+            const url = new URL(window.location.href);
+            setCallback(url.origin);
+        }
+    }, []);
+
     const configs = useQuery({
         queryFn: getConfig,
     });
@@ -45,11 +58,11 @@ export default function Page() {
                 <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md">
                     <Branding data={configs.data.branding} />
 
-                    <Steps data={credential}></Steps>
+                    <Steps data={credential} callback={callback}></Steps>
 
                     {!isEmpty(providers) && <Divider className="my-6">یا</Divider>}
 
-                    <Providers providers={providers} />
+                    <Providers providers={providers} callback={callback} />
                 </Box>
 
                 <Legals data={configs.data.legal}></Legals>

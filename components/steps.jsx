@@ -6,16 +6,12 @@ import { TextField, Typography, Link } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useFormik } from "formik";
 import axios from "@/utils/axios";
-import { useSearchParams } from "next/navigation";
 import { isEmpty } from "lodash";
 
-export default function DynamicLogin({ data }) {
+export default function DynamicLogin({ data, callback }) {
     const [step, setStep] = useState(1);
     const [selectedOption, setSelectedOption] = useState(null);
     const [currentSecretType, setCurrentSecretType] = useState(null);
-
-    const searchParams = useSearchParams();
-    var callback = searchParams.get("callback");
 
     const validationSchema = Yup.object().shape({
         identifier: Yup.string().test("match-any", "ورودی اشتباه است", function (value) {

@@ -1,12 +1,8 @@
 "use client";
 
 import { LoadingButton } from "@mui/lab";
-import { useSearchParams } from "next/navigation";
 
-export default function Providers({ providers }) {
-    const searchParams = useSearchParams();
-    const callback = searchParams.get("callback");
-
+export default function Providers({ providers, callback }) {
     return (
         <div className="space-y-3">
             {providers.map((provider, index) => (
