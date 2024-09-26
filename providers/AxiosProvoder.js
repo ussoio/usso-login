@@ -8,6 +8,7 @@ export default function AxiosProvider({ children }) {
         function (response) {
             // console.log(response);
             if (response.data) {
+                toast.dismiss();
                 toast.success(response.data.message, {
                     position: "top-right",
                 });
@@ -16,8 +17,8 @@ export default function AxiosProvider({ children }) {
             return response;
         },
         function (error) {
-            console.log(error);
             if (error.response.data) {
+                toast.dismiss();
                 toast.error(error.response.data.message, {
                     position: "top-right",
                 });
