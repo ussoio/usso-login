@@ -1,13 +1,19 @@
 "use client";
 
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 import "./fonts.css";
 import "./globals.css";
 
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import "react-toastify/dist/ReactToastify.css";
+import ToastProvider from "@/providers/ToastProvider";
+
 import { StyledEngineProvider } from "@mui/material/styles";
 import EmotionCache from "@/theme/emotion-cache";
+
+import AxiosProvider from "@/providers/AxiosProvoder";
 
 const queryClient = new QueryClient();
 
@@ -18,7 +24,11 @@ export default function RootLayout({ children }) {
                 <AppRouterCacheProvider>
                     <StyledEngineProvider injectFirst>
                         <EmotionCache>
-                            <body className={`antialiased`}>{children}</body>
+                            <body className={`antialiased`}>
+                                <ToastProvider>
+                                    <AxiosProvider>{children}</AxiosProvider>
+                                </ToastProvider>
+                            </body>
                         </EmotionCache>
                     </StyledEngineProvider>
                 </AppRouterCacheProvider>

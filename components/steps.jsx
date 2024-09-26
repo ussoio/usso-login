@@ -15,10 +15,10 @@ export default function DynamicLogin({ data }) {
     const [currentSecretType, setCurrentSecretType] = useState(null);
 
     const searchParams = useSearchParams();
-    const callback = searchParams.get("callback");
+    var callback = searchParams.get("callback");
 
     const validationSchema = Yup.object().shape({
-        identifier: Yup.string().test("match-any", "Invalid input", function (value) {
+        identifier: Yup.string().test("match-any", "ورودی اشتباه است", function (value) {
             return data.options.some((option) => new RegExp(option.regex).test(value));
         }),
     });
@@ -65,11 +65,9 @@ export default function DynamicLogin({ data }) {
                     // Call the second step API using the secret's API
                     const response = await axios.post(`${secret.api}?callback=${callback}`, payload);
 
-                    console.log("Login successful:", response.data);
                     window.location.replace(callback);
                 }
             } catch (error) {
-                console.error("API call failed:", error);
             } finally {
                 setSubmitting(false);
             }
