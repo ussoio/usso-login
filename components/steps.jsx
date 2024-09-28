@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import * as Yup from "yup";
 import { TextField, Typography, Link } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import OTPInput from "@/components/otp-input";
 import { useFormik } from "formik";
 import axios from "@/utils/axios";
 import { isEmpty } from "lodash";
@@ -91,9 +92,7 @@ export default function DynamicLogin({ data, callback }) {
 
                 try {
                     // Call the first step API again with the new method
-                    await axios.post(selectedOption.api, payload, {
-                        headers: { "Content-Type": "application/json" },
-                    });
+                    await axios.post(selectedOption.api, payload);
 
                     // Reset the value for the new secret type field
                     formik.setFieldValue(secret.type, "");
@@ -109,6 +108,24 @@ export default function DynamicLogin({ data, callback }) {
 
         const secret = selectedOption.secrets.find((s) => s.type === currentSecretType);
         if (!secret) return null;
+
+        if (secret.type === "otp" && secret.length) {
+            return (
+                <OTPInput
+                    length={secret.length}
+                    oonChange={(value) => {
+                        console.log("OTP changed:", value);
+                        formik.setFieldValue(secret.type, value);
+                    }}
+                    onComplete={(value) => {
+                        formik.setFieldValue(secret.type, value);
+                        formik.submitForm();
+                    }}
+                    onFocus={() => formik.setFieldTouched(secret.type, true)}
+                    onBlur={() => formik.setFieldTouched(secret.type, true)}
+                />
+            );
+        }
 
         return (
             <TextField
@@ -150,19 +167,21 @@ export default function DynamicLogin({ data, callback }) {
     return (
         <form onSubmit={formik.handleSubmit}>
             {step === 1 && (
-                <TextField
-                    dir="ltr"
-                    name="identifier"
-                    label={data.options.map((item) => item.placeholder).join(", ")}
-                    placeholder={data.options.map((item) => item.description).join(", ")}
-                    fullWidth
-                    margin="normal"
-                    value={formik.values.identifier}
-                    onChange={formik.handleChange}
-                    error={formik.touched.identifier && Boolean(formik.errors.identifier)}
-                    helperText={formik.touched.identifier && formik.errors.identifier}
-                    className="mb-4"
-                />
+                <>
+                    <TextField
+                        dir="ltr"
+                        name="identifier"
+                        label={data.options.map((item) => item.placeholder).join(", ")}
+                        placeholder={data.options.map((item) => item.description).join(", ")}
+                        fullWidth
+                        margin="normal"
+                        value={formik.values.identifier}
+                        onChange={formik.handleChange}
+                        error={formik.touched.identifier && Boolean(formik.errors.identifier)}
+                        helperText={formik.touched.identifier && formik.errors.identifier}
+                        className="mb-4"
+                    />
+                </>
             )}
             {step === 2 && (
                 <>
