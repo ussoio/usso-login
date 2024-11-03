@@ -67,3 +67,11 @@ h6 {
 #__next {
     isolation: isolate;
 }
+
+body {
+    height: 100vh;
+}
+
+:root {
+    --viewport-height: 100%;
+}
