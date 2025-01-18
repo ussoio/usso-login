@@ -55,6 +55,25 @@ const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur }) => {
         }
     };
 
+    const handlePaste = (event) => {
+        const pasteData = event.clipboardData.getData("Text").trim();
+        if (/^\d+$/.test(pasteData)) {
+            const pasteDigits = pasteData.slice(0, length).split("");
+            const newOtp = [...otp];
+            pasteDigits.forEach((digit, idx) => {
+                newOtp[idx] = digit;
+                if (inputRefs.current[idx]) {
+                    inputRefs.current[idx].value = digit;
+                }
+            });
+            setOtp(newOtp);
+            // Focus the next empty input or the last one
+            const nextIndex = pasteDigits.length < length ? pasteDigits.length : length - 1;
+            inputRefs.current[nextIndex].focus();
+            event.preventDefault();
+        }
+    };
+
     return (
         <div dir="ltr" className="flex justify-center gap-2">
             {otp.map((value, index) => (
@@ -66,9 +85,10 @@ const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur }) => {
                     onKeyDown={(event) => handleKeyDown(index, event)}
                     onFocus={() => handleFocus(index)}
                     onBlur={() => handleBlur(index)}
+                    onPaste={handlePaste}
                     inputProps={{
                         maxLength: 1,
-                        style: { textAlign: "center", width: "50px" }, // Set a fixed width for each input
+                        style: { textAlign: "center", width: "50px" },
                     }}
                     variant="outlined"
                     className="border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
