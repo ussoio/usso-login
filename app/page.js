@@ -82,7 +82,7 @@ export default function Page() {
                     <Providers providers={providers} callback={callback} />
                 </Box>
 
-                <Legals data={configs.data?.legal}></Legals>
+                {!isEmpty(configs.data?.legal) && <Legals data={configs.data?.legal}></Legals>}
             </div>
         </ThemeProvider>
     );
