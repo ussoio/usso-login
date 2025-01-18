@@ -38,11 +38,11 @@ export default function Page() {
         enabled: !isEmpty(configs.data),
     });
 
-    useEffect(() => {
-        if (isEmpty(cookies["usso_refresh_available"])) {
-            window.location.href = getBaseDomain();
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (isEmpty(cookies["usso_refresh_available"])) {
+    //         window.location.href = getBaseDomain();
+    //     }
+    // }, []);
 
     if (configs.isLoading || user.isLoading) {
         return <Loading></Loading>;
