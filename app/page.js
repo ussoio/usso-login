@@ -8,6 +8,7 @@ import { createTheme } from "@mui/material/styles";
 
 import { useQuery } from "@tanstack/react-query";
 import { getConfig } from "@/api/sso.api";
+import { useCookies } from "react-cookie";
 import Loading from "./loading";
 
 import Steps from "@/components/steps";
@@ -18,12 +19,28 @@ import { isEmpty, isNull } from "lodash";
 
 export default function Page() {
     const searchParams = useSearchParams();
+    const [cookies] = useCookies(["usso_refresh_token"]);
     const [callback, setCallback] = useState(searchParams.get("callback"));
+    const [origin, setOrigin] = useState(searchParams.get("origin"));
+
+    const getBaseDomain = () => {
+        const url = new URL(window.location.href);
+        const baseDomain = url.hostname.split(".").slice(-2).join(".");
+        return `https://${baseDomain}`;
+    };
 
     useEffect(() => {
         if (isNull(callback)) {
-            const url = new URL(window.location.href);
-            setCallback(url.origin);
+            setCallback(getBaseDomain());
+        }
+        if (isNull(origin)) {
+            setOrigin(getBaseDomain());
+        }
+    }, []);
+
+    useEffect(() => {
+        if (cookies["usso_refresh_token"]) {
+            window.location.href = getBaseDomain();
         }
     }, []);
 
