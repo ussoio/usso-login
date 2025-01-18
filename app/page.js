@@ -7,7 +7,7 @@ import { Box, Divider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
 import { useQuery } from "@tanstack/react-query";
-import { getConfig } from "@/api/sso.api";
+import { getConfig, checkUser } from "@/api/sso.api";
 import { useCookies } from "react-cookie";
 import Loading from "./loading";
 
@@ -19,7 +19,7 @@ import { isEmpty, isNull } from "lodash";
 
 export default function Page() {
     const searchParams = useSearchParams();
-    const [cookies] = useCookies(["usso_refresh_token"]);
+    const [cookies] = useCookies(["usso_refresh_available"]);
     const [callback, setCallback] = useState(searchParams.get("callback"));
     const [origin, setOrigin] = useState(searchParams.get("origin"));
 
@@ -29,26 +29,22 @@ export default function Page() {
         return `https://${baseDomain}`;
     };
 
-    useEffect(() => {
-        if (isNull(callback)) {
-            setCallback(getBaseDomain());
-        }
-        if (isNull(origin)) {
-            setOrigin(getBaseDomain());
-        }
-    }, []);
-
-    useEffect(() => {
-        if (cookies["usso_refresh_token"]) {
-            window.location.href = getBaseDomain();
-        }
-    }, []);
-
     const configs = useQuery({
         queryFn: getConfig,
     });
 
-    if (configs.isLoading) {
+    const user = useQuery({
+        queryFn: checkUser,
+        enabled: !isEmpty(configs.data),
+    });
+
+    useEffect(() => {
+        if (isEmpty(cookies["usso_refresh_available"])) {
+            window.location.href = getBaseDomain();
+        }
+    }, []);
+
+    if (configs.isLoading || user.isLoading) {
         return <Loading></Loading>;
     }
 
@@ -75,11 +71,11 @@ export default function Page() {
                 <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md">
                     <Branding data={configs.data?.branding} />
 
-                    <Steps data={credential} callback={callback}></Steps>
+                    <Steps data={credential} callback={configs.data.default_redirect_url || callback}></Steps>
 
                     {!isEmpty(providers) && <Divider className="my-6">یا</Divider>}
 
-                    <Providers providers={providers} callback={callback} />
+                    <Providers providers={providers} callback={configs.data.default_redirect_url || callback} />
                 </Box>
 
                 {!isEmpty(configs.data?.legal) && <Legals data={configs.data?.legal}></Legals>}
