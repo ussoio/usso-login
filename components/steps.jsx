@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import * as Yup from "yup";
-import { TextField, Typography, Link } from "@mui/material";
+import { TextField, Typography, Link, Button } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { ArrowForward } from "@mui/icons-material";
 import OTPInput from "@/components/otp-input";
 import { useFormik } from "formik";
 import axios from "@/utils/axios";
@@ -185,6 +186,16 @@ export default function DynamicLogin({ data, callback }) {
             )}
             {step === 2 && (
                 <>
+                    <Button
+                        startIcon={<ArrowForward />}
+                        onClick={() => setStep(1)}
+                        variant="text"
+                        color="primary"
+                        className="mb-4"
+                    >
+                        بازگشت
+                    </Button>
+
                     {renderSecretField()}
 
                     {!isEmpty(renderSecretOptions()[0]) && (

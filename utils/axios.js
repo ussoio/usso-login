@@ -2,7 +2,7 @@ import axios from "axios";
 
 const createConfig = () => {
     if (process.env.NODE_ENV === "development") {
-        return { baseURL: "https://sso.pixy.io/", timeout: 10000 };
+        return { baseURL: "https://sso.rentamon.com", timeout: 10000 };
     } else {
         return { timeout: 10000 };
     }

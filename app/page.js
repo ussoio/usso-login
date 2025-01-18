@@ -56,24 +56,24 @@ export default function Page() {
         cssVariables: true,
         direction: "rtl",
         typography: {
-            ...configs.data.branding.typography,
+            ...configs.data?.branding?.typography,
         },
         shape: {
-            ...configs.data.branding.shape,
+            ...configs.data?.branding?.shape,
         },
         palette: {
-            ...configs.data.branding.palette,
+            ...configs.data?.branding?.palette,
         },
     });
 
-    const credential = configs.data.methods.filter((method) => method.type == "credential")[0];
-    const providers = configs.data.methods.filter((method) => method.type == "provider");
+    const credential = configs.data?.methods?.filter((method) => method.type == "credential")[0];
+    const providers = configs.data?.methods?.filter((method) => method.type == "provider");
 
     return (
         <ThemeProvider theme={themeConfig}>
             <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-50">
                 <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md">
-                    <Branding data={configs.data.branding} />
+                    <Branding data={configs.data?.branding} />
 
                     <Steps data={credential} callback={callback}></Steps>
 
@@ -82,7 +82,7 @@ export default function Page() {
                     <Providers providers={providers} callback={callback} />
                 </Box>
 
-                <Legals data={configs.data.legal}></Legals>
+                <Legals data={configs.data?.legal}></Legals>
             </div>
         </ThemeProvider>
     );
