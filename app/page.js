@@ -19,11 +19,14 @@ import { isEmpty, isNull } from "lodash";
 
 export default function Page() {
     const searchParams = useSearchParams();
+    const callback = searchParams.get("callback");
     const [cookies] = useCookies(["usso_refresh_available"]);
-    const [callback, setCallback] = useState(searchParams.get("callback"));
-    const [origin, setOrigin] = useState(searchParams.get("origin"));
 
-    const getBaseDomain = () => {
+    const getCallback = () => {
+        if (callback) {
+            return callback;
+        }
+
         const url = new URL(window.location.href);
         const baseDomain = url.hostname.split(".").slice(-2).join(".");
         return `https://${baseDomain}`;
@@ -33,18 +36,15 @@ export default function Page() {
         queryFn: getConfig,
     });
 
-    const user = useQuery({
-        queryFn: checkUser,
-        enabled: !isEmpty(configs.data),
-    });
+    useEffect(() => {
+        if (configs.isSuccess) {
+            if (cookies.usso_refresh_available) {
+                window.location.href = getCallback() || configs.data?.default_redirect_url;
+            }
+        }
+    }, [configs.isFetched]);
 
-    // useEffect(() => {
-    //     if (isEmpty(cookies["usso_refresh_available"])) {
-    //         window.location.href = getBaseDomain();
-    //     }
-    // }, []);
-
-    if (configs.isLoading || user.isLoading) {
+    if (configs.isLoading) {
         return <Loading></Loading>;
     }
 
@@ -70,12 +70,12 @@ export default function Page() {
             <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-50">
                 <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md">
                     <Branding data={configs.data?.branding} />
-
-                    <Steps data={credential} callback={configs.data.default_redirect_url || callback}></Steps>
+        
+                    <Steps data={credential} callback={getCallback() || configs.data?.default_redirect_url}></Steps>
 
                     {!isEmpty(providers) && <Divider className="my-6">یا</Divider>}
 
-                    <Providers providers={providers} callback={configs.data.default_redirect_url || callback} />
+                    <Providers providers={providers} callback={getCallback() || configs.data?.default_redirect_url} />
                 </Box>
 
                 {!isEmpty(configs.data?.legal) && <Legals data={configs.data?.legal}></Legals>}
