@@ -64,7 +64,7 @@ export default function Page() {
     return (
         <ThemeProvider theme={themeConfig}>
             <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-50">
-                <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md">
+                <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md relative">
                     <Branding data={configs.data?.branding} />
 
                     <Steps

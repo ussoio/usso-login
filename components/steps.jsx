@@ -112,19 +112,22 @@ export default function DynamicLogin({ data, callback }) {
 
         if (secret.type === "otp" && secret.length) {
             return (
-                <OTPInput
-                    length={secret.length}
-                    oonChange={(value) => {
-                        console.log("OTP changed:", value);
-                        formik.setFieldValue(secret.type, value);
-                    }}
-                    onComplete={(value) => {
-                        formik.setFieldValue(secret.type, value);
-                        formik.submitForm();
-                    }}
-                    onFocus={() => formik.setFieldTouched(secret.type, true)}
-                    onBlur={() => formik.setFieldTouched(secret.type, true)}
-                />
+                <div className="flex flex-col gap-2">
+                    <Typography className="mb-2">{secret.placeholder}</Typography>
+                    <OTPInput
+                        length={secret.length}
+                        oonChange={(value) => {
+                            console.log("OTP changed:", value);
+                            formik.setFieldValue(secret.type, value);
+                        }}
+                        onComplete={(value) => {
+                            formik.setFieldValue(secret.type, value);
+                            formik.submitForm();
+                        }}
+                        onFocus={() => formik.setFieldTouched(secret.type, true)}
+                        onBlur={() => formik.setFieldTouched(secret.type, true)}
+                    />
+                </div>
             );
         }
 
@@ -191,9 +194,10 @@ export default function DynamicLogin({ data, callback }) {
                         onClick={() => setStep(1)}
                         variant="text"
                         color="primary"
-                        className="mb-4"
+                        className="mb-4 absolute -top-12 right-0"
+                        size="small"
                     >
-                        بازگشت
+                        تغییر روش ورود
                     </Button>
 
                     {renderSecretField()}
