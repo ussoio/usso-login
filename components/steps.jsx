@@ -197,7 +197,7 @@ export default function DynamicLogin({ data, callback }) {
                         className="mb-4 absolute -top-12 right-0"
                         size="small"
                     >
-                        تغییر روش ورود
+                        تغییر {selectedOption.placeholder}
                     </Button>
 
                     {renderSecretField()}
