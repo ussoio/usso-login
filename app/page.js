@@ -1,13 +1,13 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Box, Divider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
 import { useQuery } from "@tanstack/react-query";
-import { getConfig, checkUser } from "@/api/sso.api";
+import { getConfig, refreshToken } from "@/api/sso.api";
 import { useCookies } from "react-cookie";
 import Loading from "./loading";
 
@@ -15,7 +15,7 @@ import Steps from "@/components/steps";
 import Branding from "@/components/branding";
 import Providers from "@/components/providers";
 import Legals from "@/components/legals";
-import { isEmpty, isNull } from "lodash";
+import { isEmpty } from "lodash";
 
 export default function Page() {
     const searchParams = useSearchParams();
@@ -28,19 +28,26 @@ export default function Page() {
         return `https://${baseDomain}`;
     };
 
+    const refresh = useQuery({
+        queryKey: ["refresh"],
+        queryFn: refreshToken,
+        retry: false,
+    });
+
     const configs = useQuery({
+        queryKey: ["configs"],
         queryFn: getConfig,
     });
 
     useEffect(() => {
-        if (configs.isSuccess) {
+        if (refresh.isSuccess && configs.isSuccess) {
             if (cookies.usso_refresh_available) {
                 window.location.href = callback || configs.data?.default_redirect_url || baseDomain();
             }
         }
-    }, [configs.isFetched]);
+    }, [refresh.isSuccess, configs.isSuccess, cookies.usso_refresh_available]);
 
-    if (configs.isLoading) {
+    if (configs.isLoading || refresh.isLoading) {
         return <Loading></Loading>;
     }
 

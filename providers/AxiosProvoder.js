@@ -19,9 +19,13 @@ export default function AxiosProvider({ children }) {
         function (error) {
             if (error.response.data) {
                 toast.dismiss();
-                toast.error(error.response.data.message, {
-                    position: "top-right",
-                });
+                if (error.response.status === 401) {
+                    toast.dismiss();
+                } else {
+                    toast.error(error.response.data.message, {
+                        position: "top-right",
+                    });
+                }
             }
 
             return Promise.reject(error);
