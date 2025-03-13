@@ -31,6 +31,7 @@ export default function Page() {
     const refresh = useQuery({
         queryKey: ["refresh"],
         queryFn: refreshToken,
+        refetchOnWindowFocus: false,
         retry: false,
     });
 
