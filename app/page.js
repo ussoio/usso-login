@@ -32,6 +32,8 @@ export default function Page() {
         queryKey: ["refresh"],
         queryFn: refreshToken,
         refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
         retry: false,
     });
 
