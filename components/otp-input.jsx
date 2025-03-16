@@ -91,6 +91,7 @@ const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur }) => {
                         style: { textAlign: "center", width: "50px" },
                     }}
                     variant="outlined"
+                    type="tel"
                     className="border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
             ))}
