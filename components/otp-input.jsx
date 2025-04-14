@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { TextField } from "@mui/material";
 
-const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur }) => {
+const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur, value }) => {
     const [otp, setOtp] = useState(Array(length).fill(""));
     const inputRefs = useRef(Array(length).fill(null));
 
@@ -14,6 +14,17 @@ const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur }) => {
             onComplete(otp.join("")); // Call onComplete when OTP is fully entered
         }
     }, [otp]);
+
+    useEffect(() => {
+        if (value) {
+            setOtp((prev) => {
+                Array.from({ length }).forEach((_, index) => {
+                    prev[index] = value[index] || "";
+                });
+                return prev;
+            });
+        }
+    }, [value]);
 
     const handleChange = (index, event) => {
         const value = event.target.value;

@@ -131,7 +131,8 @@ export default function DynamicLogin({ data, callback }) {
                     <Typography className="mb-2">{secret.placeholder}</Typography>
                     <OTPInput
                         length={secret.length}
-                        oonChange={(value) => {
+                        value={formik.values[secret.type] || ""}
+                        onChange={(value) => {
                             console.log("OTP changed:", value);
                             formik.setFieldValue(secret.type, value);
                         }}
