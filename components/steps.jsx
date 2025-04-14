@@ -84,6 +84,7 @@ export default function DynamicLogin({ data, callback }) {
             navigator.credentials
                 .get({ otp: { transport: ["sms"] }, signal: ac.signal })
                 .then((otp) => {
+                    console.log(otp);
                     formik.setFieldValue("otp", otp.code);
                     formik.submitForm();
                 })
