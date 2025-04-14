@@ -78,6 +78,21 @@ export default function DynamicLogin({ data, callback }) {
         }
     }, [selectedOption]);
 
+    useEffect(() => {
+        if ("OTPCredential" in window) {
+            const ac = new AbortController();
+            navigator.credentials
+                .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+                .then((otp) => {
+                    formik.setFieldValue("otp", otp.code);
+                    formik.submitForm();
+                })
+                .catch((err) => console.error("Web OTP API Error:", err));
+
+            return () => ac.abort();
+        }
+    }, []);
+
     const handleSecretTypeChange = async (secretType) => {
         setCurrentSecretType(secretType);
 
