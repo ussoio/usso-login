@@ -86,8 +86,8 @@ export default function DynamicLogin({ data, callback }) {
                 .get({ otp: { transport: ["sms"] }, signal: ac.signal })
                 .then((otp) => {
                     console.log("Web OTP API Response:", otp);
-                    formik.setFieldValue("otp", otp.code);
-                    formik.submitForm();
+                    // formik.setFieldValue("otp", otp.code);
+                    // formik.submitForm();
                 })
                 .catch((err) => console.error("Web OTP API Error:", err));
 
