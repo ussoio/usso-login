@@ -79,36 +79,21 @@ export default function DynamicLogin({ data, callback }) {
     }, [selectedOption]);
 
     useEffect(() => {
-        if (selectedOption && selectedOption.secrets.length > 0) {
-            setCurrentSecretType(selectedOption.secrets[0].type);
-        }
-    }, [selectedOption]);
-
-    useEffect(() => {
-        // Only try to use Web OTP API when we're on step 2 and the current secret type is "otp"
-        if (step === 2 && currentSecretType === "otp" && "OTPCredential" in window) {
-            console.log("OTPCredential in window, attempting to read OTP");
+        if ("OTPCredential" in window) {
+            console.log("OTPCredential in window");
             const ac = new AbortController();
-
             navigator.credentials
                 .get({ otp: { transport: ["sms"] }, signal: ac.signal })
                 .then((otp) => {
                     console.log("Web OTP API Response:", otp);
-                    if (otp && otp.code) {
-                        // Find the secret with type "otp"
-                        const otpSecret = selectedOption.secrets.find((s) => s.type === "otp");
-                        if (otpSecret) {
-                            // Set the value using the secret's type as the field name
-                            formik.setFieldValue(otpSecret.type, otp.code);
-                            formik.submitForm();
-                        }
-                    }
+                    formik.setFieldValue("otp", otp.code);
+                    formik.submitForm();
                 })
                 .catch((err) => console.error("Web OTP API Error:", err));
 
             return () => ac.abort();
         }
-    }, [step, currentSecretType, selectedOption]);
+    }, []);
 
     const handleSecretTypeChange = async (secretType) => {
         setCurrentSecretType(secretType);
