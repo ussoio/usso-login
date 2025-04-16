@@ -79,21 +79,43 @@ export default function DynamicLogin({ data, callback }) {
     }, [selectedOption]);
 
     useEffect(() => {
-        if ("OTPCredential" in window) {
-            console.log("OTPCredential in window");
+        // Only set up OTP detection when we're in step 2 and the current secret type is OTP
+        if (step === 2 && currentSecretType === "otp" && "OTPCredential" in window) {
+            console.log("Setting up OTP detection");
             const ac = new AbortController();
+
+            // Make sure the OTP field exists in formik values
+            if (!formik.values.otp) {
+                formik.setFieldValue("otp", "");
+            }
+
             navigator.credentials
-                .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+                .get({
+                    otp: {
+                        transport: ["sms"],
+                        signal: ac.signal,
+                    },
+                })
                 .then((otp) => {
                     console.log("Web OTP API Response:", otp);
-                    formik.setFieldValue("otp", otp.code);
-                    formik.submitForm();
+                    if (otp && otp.code) {
+                        formik.setFieldValue("otp", otp.code);
+                        formik.submitForm();
+                    }
                 })
-                .catch((err) => console.error("Web OTP API Error:", err));
+                .catch((err) => {
+                    // Only log error if it's not an abort error (which happens on cleanup)
+                    if (err.name !== "AbortError") {
+                        console.error("Web OTP API Error:", err);
+                    }
+                });
 
-            return () => ac.abort();
+            return () => {
+                console.log("Cleaning up OTP detection");
+                ac.abort();
+            };
         }
-    }, []);
+    }, [step, currentSecretType, formik]);
 
     const handleSecretTypeChange = async (secretType) => {
         setCurrentSecretType(secretType);
