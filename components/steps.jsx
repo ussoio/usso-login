@@ -79,55 +79,21 @@ export default function DynamicLogin({ data, callback }) {
     }, [selectedOption]);
 
     useEffect(() => {
-        let isMounted = true;
-        let ac = null;
+        if ("OTPCredential" in window) {
+            console.log("OTPCredential in window");
+            const ac = new AbortController();
+            navigator.credentials
+                .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+                .then((otp) => {
+                    console.log("Web OTP API Response:", otp);
+                    formik.setFieldValue("otp", otp.code);
+                    formik.submitForm();
+                })
+                .catch((err) => console.error("Web OTP API Error:", err));
 
-        const setupOTPDetection = async () => {
-            // Only set up OTP detection when we're in step 2 and the current secret type is OTP
-            if (step === 2 && currentSecretType === "otp") {
-                try {
-                    // Check if we're in a browser environment and if OTP API is supported
-                    if (typeof window !== "undefined" && "OTPCredential" in window) {
-                        console.log("Setting up OTP detection");
-                        ac = new AbortController();
-
-                        // Make sure the OTP field exists in formik values
-                        if (!formik.values.otp) {
-                            formik.setFieldValue("otp", "");
-                        }
-
-                        const otp = await navigator.credentials.get({
-                            otp: {
-                                transport: ["sms"],
-                                signal: ac.signal,
-                            },
-                        });
-
-                        if (isMounted && otp && otp.code) {
-                            console.log("Web OTP API Response:", otp);
-                            formik.setFieldValue("otp", otp.code);
-                            formik.submitForm();
-                        }
-                    }
-                } catch (err) {
-                    // Only log error if it's not an abort error (which happens on cleanup)
-                    if (err.name !== "AbortError" && isMounted) {
-                        console.error("Web OTP API Error:", err);
-                    }
-                }
-            }
-        };
-
-        setupOTPDetection();
-
-        return () => {
-            isMounted = false;
-            if (ac) {
-                console.log("Cleaning up OTP detection");
-                ac.abort();
-            }
-        };
-    }, [step, currentSecretType, formik]);
+            return () => ac.abort();
+        }
+    }, []);
 
     const handleSecretTypeChange = async (secretType) => {
         setCurrentSecretType(secretType);
