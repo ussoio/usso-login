@@ -82,16 +82,30 @@ export default function DynamicLogin({ data, callback }) {
         if ("OTPCredential" in window) {
             console.log("OTPCredential in window");
             const ac = new AbortController();
+
+            let isMounted = true;
+
             navigator.credentials
                 .get({ otp: { transport: ["sms"] }, signal: ac.signal })
                 .then((otp) => {
-                    console.log("Web OTP API Response:", otp);
-                    formik.setFieldValue("otp", otp.code);
-                    formik.submitForm();
+                    console.log("otp", otp);
+                    if (isMounted) {
+                        console.log("Web OTP API Response:", otp);
+                        formik.setFieldValue("otp", otp.code);
+                        formik.submitForm();
+                    }
                 })
-                .catch((err) => console.error("Web OTP API Error:", err));
+                .catch((err) => {
+                    if (err.name !== "AbortError" && isMounted) {
+                        console.error("Web OTP API Error:", err);
+                    }
+                });
 
-            return () => ac.abort();
+            // Cleanup function
+            return () => {
+                isMounted = false;
+                ac.abort();
+            };
         }
     }, []);
 
