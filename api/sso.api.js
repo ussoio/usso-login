@@ -1,6 +1,5 @@
 import axios from "@/utils/axios";
-
-const baseUrl = process.env.NODE_ENV === "development" ? "https://sso.pixy.ir" : "";
+import { baseUrl } from "@/utils/axios";
 
 export async function getConfig() {
     try {
