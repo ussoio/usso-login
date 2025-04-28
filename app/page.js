@@ -19,27 +19,14 @@ import { isEmpty } from "lodash";
 
 export default function Page() {
     const searchParams = useSearchParams();
+    const callback = searchParams.get("callback");
+    const [cookies] = useCookies(["usso_refresh_available"]);
 
     const baseDomain = () => {
         const url = new URL(window.location.href);
         const baseDomain = url.hostname.split(".").slice(-2).join(".");
         return `https://${baseDomain}`;
     };
-
-    const isValidRedirectUrl = (url) => {
-        try {
-            const parsedUrl = new URL(url);
-            const allowedDomains = ["rentamon.com", "app.rentamon.com"];
-            return allowedDomains.some((domain) => parsedUrl.hostname.endsWith(domain));
-        } catch (e) {
-            return false;
-        }
-    };
-
-    const callback = searchParams.get("callback");
-    const safeCallback = callback && isValidRedirectUrl(callback) ? callback : baseDomain();
-
-    const [cookies] = useCookies(["usso_refresh_available"]);
 
     const refresh = useQuery({
         queryKey: ["refresh"],
@@ -58,7 +45,7 @@ export default function Page() {
     useEffect(() => {
         if (refresh.isSuccess && configs.isSuccess) {
             if (cookies.usso_refresh_available) {
-                window.location.href = safeCallback;
+                window.location.href = callback || configs.data?.default_redirect_url || baseDomain();
             }
         }
     }, [refresh.isSuccess, configs.isSuccess, cookies.usso_refresh_available]);
@@ -90,11 +77,17 @@ export default function Page() {
                 <Box className="bg-white p-8 rounded-lg w-full max-w-80 shadow-none md:max-w-sm md:shadow-md relative">
                     <Branding data={configs.data?.branding} />
 
-                    <Steps data={credential} callback={safeCallback}></Steps>
+                    <Steps
+                        data={credential}
+                        callback={callback || configs.data?.default_redirect_url || baseDomain()}
+                    ></Steps>
 
                     {!isEmpty(providers) && <Divider className="my-6">یا</Divider>}
 
-                    <Providers providers={providers} callback={safeCallback} />
+                    <Providers
+                        providers={providers}
+                        callback={callback || configs.data?.default_redirect_url || baseDomain()}
+                    />
                 </Box>
 
                 {!isEmpty(configs.data?.legal) && <Legals data={configs.data?.legal}></Legals>}
