@@ -16,16 +16,23 @@ import Branding from "@/components/branding";
 import Providers from "@/components/providers";
 import Legals from "@/components/legals";
 import { isEmpty } from "lodash";
+import { validateRedirectUrl } from "@/utils/url";
 
 export default function Page() {
     const searchParams = useSearchParams();
-    const callback = searchParams.get("callback");
+    const rawCallback = searchParams.get("callback");
     const [cookies] = useCookies(["usso_refresh_available"]);
 
     const baseDomain = () => {
         const url = new URL(window.location.href);
         const baseDomain = url.hostname.split(".").slice(-2).join(".");
         return `https://${baseDomain}`;
+    };
+
+    // Get allowed domains from config or use a default list
+    const getAllowedDomains = (config) => {
+        const defaultDomains = [window.location.hostname];
+        return config?.allowed_domains || defaultDomains;
     };
 
     const refresh = useQuery({
@@ -45,7 +52,11 @@ export default function Page() {
     useEffect(() => {
         if (refresh.isSuccess && configs.isSuccess) {
             if (cookies.usso_refresh_available) {
-                window.location.href = callback || configs.data?.default_redirect_url || baseDomain();
+                const allowedDomains = getAllowedDomains(configs.data);
+                const validatedCallback = validateRedirectUrl(rawCallback, allowedDomains);
+                const redirectUrl = validatedCallback || configs.data?.default_redirect_url || baseDomain();
+
+                window.location.href = redirectUrl;
             }
         }
     }, [refresh.isSuccess, configs.isSuccess, cookies.usso_refresh_available]);
@@ -79,14 +90,14 @@ export default function Page() {
 
                     <Steps
                         data={credential}
-                        callback={callback || configs.data?.default_redirect_url || baseDomain()}
+                        callback={rawCallback || configs.data?.default_redirect_url || baseDomain()}
                     ></Steps>
 
                     {!isEmpty(providers) && <Divider className="my-6">یا</Divider>}
 
                     <Providers
                         providers={providers}
-                        callback={callback || configs.data?.default_redirect_url || baseDomain()}
+                        callback={rawCallback || configs.data?.default_redirect_url || baseDomain()}
                     />
                 </Box>
 
