@@ -80,7 +80,6 @@ export default function DynamicLogin({ data, callback }) {
 
     useEffect(() => {
         if ("OTPCredential" in window) {
-            console.log("OTPCredential in window");
             const ac = new AbortController();
 
             let isMounted = true;
@@ -92,7 +91,6 @@ export default function DynamicLogin({ data, callback }) {
                     if (isMounted) {
                         console.log("Web OTP API Response:", otp);
                         formik.setFieldValue("otp", otp.code);
-                        formik.submitForm();
                     }
                 })
                 .catch((err) => {
@@ -153,6 +151,7 @@ export default function DynamicLogin({ data, callback }) {
                             formik.setFieldValue(secret.type, value);
                         }}
                         onComplete={(value) => {
+                            console.log("OTP complete:", value);
                             formik.setFieldValue(secret.type, value);
                             formik.submitForm();
                         }}
