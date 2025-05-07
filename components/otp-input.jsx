@@ -89,6 +89,7 @@ const OTPInput = ({ length = 4, onChange, onComplete, onFocus, onBlur, value }) 
         <div dir="ltr" className="flex justify-center gap-2">
             {otp.map((value, index) => (
                 <TextField
+                    autoComplete="one-time-code"
                     key={index}
                     inputRef={(el) => (inputRefs.current[index] = el)}
                     value={value}
