@@ -19,9 +19,10 @@ export default function AxiosProvider({ children }) {
         function (error) {
             if (error.response.data) {
                 toast.dismiss();
-                if (error.response.status === 401) {
+                if (error.response.status === 401 && !error.request.responseURL.includes("login")) {
                     toast.dismiss();
                 } else {
+                    toast.dismiss();
                     toast.error(error.response.data.message, {
                         position: "top-right",
                     });
