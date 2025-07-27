@@ -13,7 +13,7 @@ import ToastProvider from "@/providers/ToastProvider";
 import { StyledEngineProvider } from "@mui/material/styles";
 import EmotionCache from "@/theme/emotion-cache";
 
-import AxiosProvider from "@/providers/AxiosProvoder";
+import AxiosProvider from "@/providers/AxiosProvider";
 
 const queryClient = new QueryClient();
 
