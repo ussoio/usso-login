@@ -17,6 +17,7 @@ import Providers from "@/components/providers";
 import Legals from "@/components/legals";
 import { isEmpty } from "lodash";
 import { validateRedirectUrl } from "@/utils/url";
+import { loadFontFromObject } from "@/utils/loadFont";
 
 export default function Page() {
     const searchParams = useSearchParams();
@@ -57,6 +58,20 @@ export default function Page() {
                 const redirectUrl = validatedCallback || configs.data?.default_redirect_url || baseDomain();
 
                 window.location.href = redirectUrl;
+            }
+        }
+
+        if (configs.isSuccess) {
+            const fontList = configs.data?.branding?.fontList;
+            if (fontList && Array.isArray(fontList) && fontList.length > 0) {
+                fontList.forEach(async (font) => {
+                    try {
+                        await loadFontFromObject(font);
+                        console.log(`Font ${font.name} loaded successfully`);
+                    } catch (error) {
+                        console.error(`Failed to load font ${font.name}:`, error);
+                    }
+                });
             }
         }
     }, [refresh.isSuccess, configs.isSuccess, cookies.usso_refresh_available]);

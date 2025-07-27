@@ -9,7 +9,17 @@
             "primary": { "main": "#f44336" },
             "secondary": { "main": "#e91e63" },
             "text": { "main": "#000000" }
-        }
+        },
+        "fontList": [
+            {
+                "name": "Vazir",
+                "url": "/fonts/vazir/Vazir.woff"
+            },
+            {
+                "name": "VazirBold",
+                "url": "/fonts/vazir/VazirBold.woff"
+            }
+        ]
     },
     "legal": { "privacy": "https://example.com/privacy", "terms": "https://example.com/terms" },
     "methods": [
